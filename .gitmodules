@@ -1,6 +1,6 @@
 [submodule "plugins/zsh-autosuggestions"]
 	path = plugins/zsh-autosuggestions
-	url = /Users/ctharings/.oh-my-zsh/custom/plugins/zsh-autosuggestions
+	url = git://github.com/zsh-users/zsh-autosuggestions.git
 [submodule "plugins/zsh-syntax-highlighting"]
 	path = plugins/zsh-syntax-highlighting
-	url = /Users/ctharings/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting
+	url = git://github.com/zsh-users/zsh-syntax-highlighting.git
