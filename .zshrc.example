@@ -54,7 +54,7 @@ ENABLE_CORRECTION="true"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git svn nvm textmate zsh-autosuggestions zsh-syntax-highlighting setjdk tree)
+plugins=(autoswitch-virtualenv git svn nvm textmate setjdk tree virtualenv virtualenvwrapper zsh-autosuggestions zsh-syntax-highlighting)
 
 source $ZSH/oh-my-zsh.sh
 
