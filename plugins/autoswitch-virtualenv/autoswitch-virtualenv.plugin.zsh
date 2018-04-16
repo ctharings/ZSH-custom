@@ -1,3 +1,14 @@
+if ! type workon > /dev/null; then
+    export DISABLE_AUTOSWITCH_VENV="1"
+    printf "\e[1m\e[31m"
+    printf "zsh-autoswitch-virtualenv requires virtualenvwrapper to be installed!\n\n"
+    printf "If this is already installed but you are still seeing this message, add the "
+    printf "following to your ~/.zshrc:\n"
+    printf "\e[39m"
+    printf "source =virtualenvwrapper.sh\n"
+    printf "\e[0m"
+fi
+
 function _maybeworkon() {
   if [[ -z "$VIRTUAL_ENV" || "$1" != "$(basename $VIRTUAL_ENV)" ]]; then
      if [ -z "$AUTOSWITCH_SILENT" ]; then
@@ -20,7 +31,7 @@ function _check_venv_path()
     local check_dir=$1
 
     if [[ -f "${check_dir}/.venv" ]]; then
-        echo "${check_dir}/.venv"
+        printf "${check_dir}/.venv"
         return
     else
         if [ "$check_dir" = "/" ]; then
@@ -53,15 +64,13 @@ function check_venv()
           fi
 
           if [[ "$file_owner" != "$(id -u)" ]]; then
-            echo "AUTOSWITCH WARNING: Virtualenv will not be activated"
-            echo ""
-            echo "Reason: Found a .venv file but it is not owned by the current user"
-            echo "Change ownership of $venv_path to '$USER' to fix this"
+            printf "AUTOSWITCH WARNING: Virtualenv will not be activated\n\n"
+            printf "Reason: Found a .venv file but it is not owned by the current user\n"
+            printf "Change ownership of $venv_path to '$USER' to fix this\n"
           elif [[ "$file_permissions" != "600" ]]; then
-            echo "AUTOSWITCH WARNING: Virtualenv will not be activated"
-            echo ""
-            echo "Reason: Found a .venv file with weak permission settings ($file_permissions)."
-            echo "Run the following command to fix this: \"chmod 600 $venv_path\""
+            printf "AUTOSWITCH WARNING: Virtualenv will not be activated\n\n"
+            printf "Reason: Found a .venv file with weak permission settings ($file_permissions).\n"
+            printf "Run the following command to fix this: \"chmod 600 $venv_path\"\n"
           else
             SWITCH_TO="$(<"$venv_path")"
           fi
@@ -90,15 +99,21 @@ function _default_venv()
 function rmvenv()
 {
   if [[ -f ".venv" ]]; then
+
     venv_name="$(<.venv)"
-    current_venv="$(basename $VIRTUAL_ENV)"
-    if [[ "$current_venv" = "$venv_name" ]]; then
-      _default_venv
+
+    # detect if we need to switch virtualenv first
+    if [[ -n "$VIRTUAL_ENV" ]]; then
+        current_venv="$(basename $VIRTUAL_ENV)"
+        if [[ "$current_venv" = "$venv_name" ]]; then
+            _default_venv
+        fi
     fi
+
     rmvirtualenv "$venv_name"
     rm ".venv"
   else
-    echo "No .venv file in the current directory!"
+    printf "No .venv file in the current directory!\n"
   fi
 }
 
@@ -107,7 +122,7 @@ function rmvenv()
 function mkvenv()
 {
   if [[ -f ".venv" ]]; then
-    echo ".venv file already exists. If this is a mistake use the rmvenv command"
+    printf ".venv file already exists. If this is a mistake use the rmvenv command\n"
   else
     venv_name="$(basename $PWD)"
     mkvirtualenv "$venv_name" $@
@@ -122,15 +137,16 @@ function mkvenv()
         pip install -r "$requirements"
       fi
     done
-    echo "$venv_name" > ".venv"
+    printf "$venv_name\n" > ".venv"
     chmod 600 .venv
     AUTOSWITCH_PROJECT="$PWD"
   fi
 }
 
-autoload -Uz add-zsh-hook
-add-zsh-hook -D chpwd check_venv
-add-zsh-hook chpwd check_venv
+if [[ -z "$DISABLE_AUTOSWITCH_VENV" ]]; then
+    autoload -Uz add-zsh-hook
+    add-zsh-hook -D chpwd check_venv
+    add-zsh-hook chpwd check_venv
 
-# auto-detect virtualenv on zsh startup
-[[ -o interactive ]] && check_venv
+    check_venv
+fi
