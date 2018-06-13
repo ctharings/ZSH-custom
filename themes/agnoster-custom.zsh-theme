@@ -234,16 +234,17 @@ prompt_jdk() {
 
 prompt_node() {
   (( $+commands[node] )) || return
-  local node_version=$(node --version)
+  local node_version
+  node_version=$(nvm version) || node_version=$(node --version)
   #local node_char=$'\ue718' # 
   case "${node_version//v}" in
-    9\.*)
+    12\.*)
     prompt_segment black cyan
     ;;
-    8\.*)
+    10\.*)
     prompt_segment black yellow
     ;;
-    7\.*)
+    8\.*)
     prompt_segment green black
     ;;
     6\.*)
