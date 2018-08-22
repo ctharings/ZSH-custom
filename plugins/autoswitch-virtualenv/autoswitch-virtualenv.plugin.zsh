@@ -1,4 +1,4 @@
-export AUTOSWITCH_VERSION='0.3.4'
+export AUTOSWITCH_VERSION='0.3.6'
 
 if ! type workon > /dev/null; then
     export DISABLE_AUTOSWITCH_VENV="1"
@@ -25,8 +25,14 @@ function _maybeworkon() {
      workon "$1"
 
      if [ -z "$AUTOSWITCH_SILENT" ]; then
-       # For some reason python --version writes to st derr
-       printf "[%s]\n" "$(python --version 2>&1)"
+       # For some reason python --version writes to stderr
+       if type python > /dev/null; then
+           printf "[%s]\n" "$(python --version 2>&1)"
+       elif type python3 > /dev/null; then
+           printf "[%s]\n" "$(python3 --version 2>&1)"
+       else
+           printf "Unable to find python installed on this machine"
+        fi
      fi
   fi
 }
@@ -77,7 +83,7 @@ function check_venv()
             printf "AUTOSWITCH WARNING: Virtualenv will not be activated\n\n"
             printf "Reason: Found a .venv file but it is not owned by the current user\n"
             printf "Change ownership of $venv_path to '$USER' to fix this\n"
-          elif [[ "$file_permissions" != "600" ]]; then
+          elif ! [[ "$file_permissions" =~ ^[64][04][04]$ ]]; then
             printf "AUTOSWITCH WARNING: Virtualenv will not be activated\n\n"
             printf "Reason: Found a .venv file with weak permission settings ($file_permissions).\n"
             printf "Run the following command to fix this: \"chmod 600 $venv_path\"\n"
