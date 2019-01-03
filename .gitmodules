@@ -6,7 +6,7 @@
 	path = plugins/zsh-syntax-highlighting
 	url = git://github.com/zsh-users/zsh-syntax-highlighting.git
 	branch = master
-[submodule "plugins/zsh-autoswitch-virtualenv"]
-	path = plugins/zsh-autoswitch-virtualenv
+[submodule "plugins/autoswitch-virtualenv"]
+	path = plugins/autoswitch-virtualenv
 	url = git://github.com/MichaelAquilina/zsh-autoswitch-virtualenv.git
 	branch = master
