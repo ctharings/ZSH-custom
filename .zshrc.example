@@ -90,6 +90,9 @@ alias agnoster="mate ~/.oh-my-zsh/custom/themes/agnoster-custom.zsh-theme"
 alias hosts="mate /etc/hosts"
 alias c=clear
 
+# NodeJS options customization
+# export NODE_OPTIONS=--max_old_space_size=4096
+
 # # Dinghy/Docker environment
 # export DOCKER_HOST="tcp://192.168.99.100:2376"
 # export DOCKER_CERT_PATH="$HOME/.docker/machine/machines/dinghy"
