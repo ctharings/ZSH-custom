@@ -135,7 +135,7 @@ prompt_git() {
     zstyle ':vcs_info:*' formats ' %u%c'
     zstyle ':vcs_info:*' actionformats ' %u%c'
     vcs_info
-    echo -n "${ref/refs\/heads\//$PL_BRANCH_CHAR }${vcs_info_msg_0_%% }${mode}"
+    echo -n "${${ref:gs/%/%%}/refs\/heads\//$PL_BRANCH_CHAR }${vcs_info_msg_0_%% }${mode}"
   fi
 }
 
@@ -157,7 +157,7 @@ prompt_svn() {
 }
 
 prompt_bzr() {
-    (( $+commands[bzr] )) || return
+  (( $+commands[bzr] )) || return
 
   # Test if bzr repository in directory hierarchy
   local dir="$PWD"
@@ -170,17 +170,17 @@ prompt_bzr() {
   if bzr_status=$(bzr status 2>&1); then
     status_mod=$(echo -n "$bzr_status" | head -n1 | grep "modified" | wc -m)
     status_all=$(echo -n "$bzr_status" | head -n1 | wc -m)
-    revision=$(bzr log -r-1 --log-format line | cut -d: -f1)
-        if [[ $status_mod -gt 0 ]] ; then
+    revision=${$(bzr log -r-1 --log-format line | cut -d: -f1):gs/%/%%}
+    if [[ $status_mod -gt 0 ]] ; then
       prompt_segment yellow black "bzr@$revision ✚"
-        else
-            if [[ $status_all -gt 0 ]] ; then
+    else
+      if [[ $status_all -gt 0 ]] ; then
         prompt_segment yellow black "bzr@$revision"
-            else
+      else
         prompt_segment green black "bzr@$revision"
-            fi
-        fi
+      fi
     fi
+  fi
 }
 
 prompt_hg() {
@@ -200,7 +200,7 @@ prompt_hg() {
         # if working copy is clean
         prompt_segment green $CURRENT_FG
       fi
-      echo -n $(hg prompt "☿ {rev}@{branch}") $st
+      echo -n ${$(hg prompt "☿ {rev}@{branch}"):gs/%/%%} $st
     else
       st=""
       rev=$(hg id -n 2>/dev/null | sed 's/[^-0-9]//g')
@@ -214,7 +214,7 @@ prompt_hg() {
       else
         prompt_segment green $CURRENT_FG
       fi
-      echo -n "☿ $rev@$branch" $st
+      echo -n "☿ ${rev:gs/%/%%}@${branch:gs/%/%%}" $st
     fi
   fi
 }
@@ -226,9 +226,8 @@ prompt_dir() {
 
 # Virtualenv: current working virtualenv
 prompt_virtualenv() {
-  local virtualenv_path="$VIRTUAL_ENV"
-  if [[ -n $virtualenv_path && -n $VIRTUAL_ENV_DISABLE_PROMPT ]]; then
-    prompt_segment blue black "(`basename $virtualenv_path`)"
+  if [[ -n "$VIRTUAL_ENV" && -n "$VIRTUAL_ENV_DISABLE_PROMPT" ]]; then
+    prompt_segment blue black "(${VIRTUAL_ENV:t:gs/%/%%})"
   fi
 }
 
@@ -283,6 +282,39 @@ prompt_node() {
   echo -n "$node_version"
 }
 
+prompt_ruby() {
+    (( $+commands[ruby] )) || return
+    local ruby_version
+    ruby_version=$(rvm current) || ruby_version=$(ruby --version)
+    case "${ruby_version//ruby-}" in
+      2.7.4\.*)
+      prompt_segment red cyan
+      ;;
+      2.7.3\.*)
+      prompt_segment red yellow
+      ;;
+      2.5\.*)
+      prompt_segment red black
+      ;;
+      2.4\.*)
+      prompt_segment red green
+      ;;
+      2.3\.*)
+      prompt_segment red magenta
+      ;;
+      2\.*)
+      prompt_segment red yellow
+      ;;
+      [0-1]\.*)
+      prompt_segment red black
+      ;;
+      *)
+      prompt_segment black red
+      ;;
+    esac
+    echo -n "$ruby_version"
+}
+
 # Status:
 # - was there an error
 # - am I root
@@ -305,8 +337,8 @@ prompt_status() {
 prompt_aws() {
   [[ -z "$AWS_PROFILE" || "$SHOW_AWS_PROMPT" = false ]] && return
   case "$AWS_PROFILE" in
-    *-prod|*production*) prompt_segment red yellow  "AWS: $AWS_PROFILE" ;;
-    *) prompt_segment green black "AWS: $AWS_PROFILE" ;;
+    *-prod|*production*) prompt_segment red yellow  "AWS: ${AWS_PROFILE:gs/%/%%}" ;;
+    *) prompt_segment green black "AWS: ${AWS_PROFILE:gs/%/%%}" ;;
   esac
 }
 
@@ -320,6 +352,7 @@ build_prompt() {
   prompt_dir
   # prompt_jdk
   prompt_node
+  # prompt_ruby
   prompt_git
   prompt_svn
   prompt_bzr
