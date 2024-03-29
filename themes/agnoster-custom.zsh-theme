@@ -254,25 +254,22 @@ prompt_node() {
   node_version=$(nvm version) || node_version=$(node --version)
   #local node_char=$'\ue718' # 
   case "${node_version//v}" in
-    18\.*)
+    24\.*)
     prompt_segment black cyan
     ;;
-    16\.*)
+    22\.*)
     prompt_segment black yellow
     ;;
-    14\.*)
-    prompt_segment green black
-    ;;
-    12\.*)
+    20\.*)
     prompt_segment cyan black
     ;;
-    10\.*)
+    18\.*)
+    prompt_segment green black
+    ;;
+    16\.*)
     prompt_segment magenta black
     ;;
-    8\.*)
-    prompt_segment yellow black
-    ;;
-    [0-7]\.*)
+    [0-14]\.*)
     prompt_segment red black
     ;;
     *)
@@ -287,25 +284,25 @@ prompt_ruby() {
     local ruby_version
     ruby_version=$(rvm current) || ruby_version=$(ruby --version)
     case "${ruby_version//ruby-}" in
-      2.7.4\.*)
+      3.5\.*)
       prompt_segment red cyan
       ;;
-      2.7.3\.*)
+      3.4\.*)
       prompt_segment red yellow
       ;;
-      2.5\.*)
+      3.3\.*)
       prompt_segment red black
       ;;
-      2.4\.*)
+      3.2\.*)
       prompt_segment red green
       ;;
-      2.3\.*)
+      3.1\.*)
       prompt_segment red magenta
       ;;
-      2\.*)
+      3\.*)
       prompt_segment red yellow
       ;;
-      [0-1]\.*)
+      [0-2]\.*)
       prompt_segment red black
       ;;
       *)
@@ -350,9 +347,9 @@ build_prompt() {
   prompt_aws
   prompt_context
   prompt_dir
-  # prompt_jdk
+#  prompt_jdk
   prompt_node
-  # prompt_ruby
+#  prompt_ruby
   prompt_git
   prompt_svn
   prompt_bzr
